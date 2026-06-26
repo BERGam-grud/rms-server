@@ -1,0 +1,36 @@
+services:
+  # ── FastAPI веб-сервер ─────────────────────────────────────
+  - type: web
+    name: rms-server
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rms-postgres
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: TELEGRAM_TOKEN
+        sync: false        # введіть вручну в Render Dashboard
+      - key: NOTIFY_CHAT_IDS
+        sync: false
+      - key: GMAIL_USER
+        sync: false
+      - key: GMAIL_PASS
+        sync: false
+      - key: NOTIFY_EMAILS
+        sync: false
+      - key: NOTIFY_MIN_LEVEL
+        value: WARNING
+      - key: NOTIFY_COOLDOWN_MIN
+        value: "30"
+
+databases:
+  # ── PostgreSQL ─────────────────────────────────────────────
+  - name: rms-postgres
+    databaseName: radiation_monitoring
+    user: rms_user
+    plan: free
